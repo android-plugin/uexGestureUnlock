@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+
+    <script type="text/javascript">
+    function isGestureCodeSet(){
+        var params = {
+        };
+        var data = JSON.stringify(params);
+        uexGestureUnlock.isGestureCodeSet(data);
+    }
+
+    function resetGestureCode(){
+        var params = {
+        };
+        var data = JSON.stringify(params);
+        uexGestureUnlock.resetGestureCode(data);
+    }
+
+    function config(){
+        var params = {
+        };
+        var data = JSON.stringify(params);
+        uexGestureUnlock.config(data);
+    }
+
+    function verify(){
+        var params = {
+        };
+        var data = JSON.stringify(params);
+        uexGestureUnlock.verify(data);
+    }
+
+    function create(){
+        var params = {
+        };
+        var data = JSON.stringify(params);
+        uexGestureUnlock.create(data);
+    }
+
+    function cancel(){
+        var params = {
+        };
+        var data = JSON.stringify(params);
+        uexGestureUnlock.cancel(data);
+    }
+
+
+        window.uexOnload = function(type){
+            if(type == 0){
+            uexGestureUnlock.cbIsGestureCodeSet = cbIsGestureCodeSet;
+            uexGestureUnlock.cbVerify = cbVerify;
+            uexGestureUnlock.cbCreate = cbCreate;
+            uexGestureUnlock.onEventOccur = onEventOccur;
+
+            }
+        }
+    function cbIsGestureCodeSet(info){
+        alert(info);
+    }
+
+    function cbVerify(info){
+        alert(info);
+    }
+
+    function cbCreate(info){
+        alert(info);
+    }
+
+    function onEventOccur(info){
+        alert(info);
+    }
+
+
+    </script>
+</head>
+
+<body>
+<div class="tit">uexGestureUnlock</div>
+<div class="conbor">
+    <div class="consj">
+            <input class='btn' type='button' value='isGestureCodeSet' onclick='isGestureCodeSet()'>
+
+            <input class='btn' type='button' value='resetGestureCode' onclick='resetGestureCode()'>
+
+            <input class='btn' type='button' value='config' onclick='config()'>
+
+            <input class='btn' type='button' value='verify' onclick='verify()'>
+
+            <input class='btn' type='button' value='create' onclick='create()'>
+
+            <input class='btn' type='button' value='cancel' onclick='cancel()'>
+
+
+    </div>
+</div>
+</body>
+</html>

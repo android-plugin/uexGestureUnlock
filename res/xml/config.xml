@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<uexplugins>
+    <plugin
+        className="org.zywx.wbpalmstar.plugin.uexgestureunlock.EUExGestureUnlock" uexName="uexGestureUnlock" >
+        <method name="isGestureCodeSet" type = "1"/>
+        <method name="resetGestureCode"/>
+        <method name="config"/>
+        <method name="verify"  type = "1"/>
+        <method name="create"  type = "1"/>
+        <method name="cancel"/>
+
+        <method name = "onEventOccur" type = "2"/>
+</plugin>
+</uexplugins>
