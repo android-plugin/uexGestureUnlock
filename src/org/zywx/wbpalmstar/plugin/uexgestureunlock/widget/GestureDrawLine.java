@@ -342,7 +342,6 @@ public class GestureDrawLine extends View {
      * 校验错误/两次绘制不一致提示
      */
     private void drawErrorPathTip() {
-        Log.i("djf" , "drawErrorPathTip:");
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         if (mOnDrawArrowListener != null){
             mOnDrawArrowListener.onErrorState();
