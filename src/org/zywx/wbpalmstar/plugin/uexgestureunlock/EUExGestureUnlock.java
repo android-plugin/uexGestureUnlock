@@ -52,21 +52,12 @@ public class EUExGestureUnlock extends EUExBase {
     }
 
 
-    public void isGestureCodeSet(String[] params) {
-        Message msg = new Message();
-        msg.obj = this;
-        msg.what = MSG_IS_GESTURE_CODE_SET;
-        Bundle bd = new Bundle();
-        bd.putStringArray(BUNDLE_DATA, params);
-        msg.setData(bd);
-        mHandler.sendMessage(msg);
-    }
-
-    private void isGestureCodeSetMsg() {
+    public boolean isGestureCodeSet(String[] params) {
         boolean isGestureCodeSet = !TextUtils.isEmpty(getGestureData());
         ResultIsGestureSetVO result = new ResultIsGestureSetVO();
         result.setResult(isGestureCodeSet);
         callBackPluginJs(JsConst.CALLBACK_IS_GESTURE_CODE_SET, DataHelper.gson.toJson(result));
+        return isGestureCodeSet;
     }
 
     public void resetGestureCode(String[] params) {
@@ -118,27 +109,20 @@ public class EUExGestureUnlock extends EUExBase {
     }
 
     public void verify(String[] params) {
-        Message msg = new Message();
-        msg.obj = this;
-        msg.what = MSG_VERIFY;
-        Bundle bd = new Bundle();
-        bd.putStringArray(BUNDLE_DATA, params);
-        msg.setData(bd);
-        mHandler.sendMessage(msg);
-    }
-
-    private void verifyMsg() {
+        int callbackId=-1;
+        if (params!=null&&params.length>0){
+            callbackId= Integer.parseInt(params[0]);
+        }
         String gestureCode = getGestureData();
         if (TextUtils.isEmpty(gestureCode)){
             ResultFailedVO result = new ResultFailedVO();
             result.setErrorCode(JsConst.ERROR_CODE_NONE_GESTURE);
             result.setErrorString(EUExUtil
                     .getString("plugin_uexGestureUnlock_errorCodeNoneGesture"));
-            callBackVerify(result);
+            callBackVerify(result,callbackId);
             return;
         }
-        openVerifyGestureLayout(false, gestureCode);
-
+        openVerifyGestureLayout(false, gestureCode,callbackId);
     }
 
     public void create(String[] params) {
@@ -152,23 +136,30 @@ public class EUExGestureUnlock extends EUExBase {
     }
 
     private void createMsg(String[] params) {
+
         boolean isNeedVerifyBeforeCreate = true;
         if (params != null && params.length > 0) {
             CreateGestureVO dataVO = DataHelper.gson.fromJson(params[0], CreateGestureVO.class);
             isNeedVerifyBeforeCreate = dataVO.isNeedVerifyBeforeCreate();
         }
+        int callbackId=-1;
+        if (params!=null&&params.length>1){
+            callbackId= Integer.parseInt(params[1]);
+        }
         if (isNeedVerifyBeforeCreate && !TextUtils.isEmpty(getGestureData())){
-            openVerifyGestureLayout(true, getGestureData());
+            openVerifyGestureLayout(true, getGestureData(), callbackId);
         }else{
-            openCreateGestureLayout();
+            openCreateGestureLayout(callbackId);
         }
     }
 
-    private void openVerifyGestureLayout(boolean isHasCreate, String gestureCode) {
+    private void openVerifyGestureLayout(boolean isHasCreate, String gestureCode, int callbackId) {
         if (mGestureVerifyFragment != null){
             closeVerifyFragment();
         }
         mGestureVerifyFragment = new GestureVerifyFragment();
+        mGestureVerifyListener.callbackId=callbackId;
+        mGestureVerifyListener.isCreate=isHasCreate;
         mGestureVerifyFragment.setGestureVerifyListener(mGestureVerifyListener);
         mGestureVerifyFragment.setGestureCodeData(gestureCode);
         mGestureVerifyFragment.setData(mData);
@@ -178,11 +169,12 @@ public class EUExGestureUnlock extends EUExBase {
         addFragmentToCurrentWindow(mGestureVerifyFragment, lp, TAG_GESTURE_VERIFY);
     }
 
-    private void openCreateGestureLayout() {
+    private void openCreateGestureLayout(int callbackId) {
         if (mGestureVerifyFragment != null){
             closeCreateFragment();
         }
         mGestureCreateFragment = new GestureCreateFragment();
+        mGestureCreateListener.callbackId=callbackId;
         mGestureCreateFragment.setGestureCreateListener(mGestureCreateListener);
         mGestureCreateFragment.setData(mData);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
@@ -208,7 +200,7 @@ public class EUExGestureUnlock extends EUExBase {
             result.setErrorCode(JsConst.ERROR_CODE_CANCEL_OUTSIDE);
             result.setErrorString(EUExUtil
                     .getString("plugin_uexGestureUnlock_errorCodeCancelOutside"));
-            callBackVerify(result);
+            callBackVerify(result,mGestureVerifyListener.callbackId);
         }
         if (mGestureCreateFragment != null){
             closeCreateFragment();
@@ -217,7 +209,7 @@ public class EUExGestureUnlock extends EUExBase {
             result.setErrorCode(JsConst.ERROR_CODE_CANCEL_OUTSIDE);
             result.setErrorString(EUExUtil
                     .getString("plugin_uexGestureUnlock_errorCodeCancelOutside"));
-            callBackCreate(result);
+            callBackCreate(result, mGestureCreateListener.callbackId);
         }
     }
 
@@ -229,17 +221,11 @@ public class EUExGestureUnlock extends EUExBase {
         Bundle bundle=message.getData();
         switch (message.what) {
 
-            case MSG_IS_GESTURE_CODE_SET:
-                isGestureCodeSetMsg();
-                break;
             case MSG_RESET_GESTURE_CODE:
                 resetGestureCodeMsg();
                 break;
             case MSG_CONFIG:
                 configMsg(bundle.getStringArray(BUNDLE_DATA));
-                break;
-            case MSG_VERIFY:
-                verifyMsg();
                 break;
             case MSG_CREATE:
                 createMsg(bundle.getStringArray(BUNDLE_DATA));
@@ -258,10 +244,17 @@ public class EUExGestureUnlock extends EUExBase {
         onCallback(js);
     }
 
-    private GestureVerifyListener mGestureVerifyListener = new GestureVerifyListener() {
+    MyGestureVerifyListener mGestureVerifyListener=new MyGestureVerifyListener();
+
+    public class MyGestureVerifyListener implements GestureVerifyListener{
+
+        public boolean isCreate=false;
+
+        public int callbackId=-1;
+
         @Override
         public void onVerifyResult(ResultVerifyVO result) {
-            callBackVerify(result);
+            callBackVerify(result,callbackId);
         }
 
         @Override
@@ -271,7 +264,7 @@ public class EUExGestureUnlock extends EUExBase {
 
         @Override
         public void onStartCreate() {
-            openCreateGestureLayout();
+            openCreateGestureLayout(callbackId);
         }
 
         @Override
@@ -281,10 +274,14 @@ public class EUExGestureUnlock extends EUExBase {
             result.setErrorCode(JsConst.ERROR_CODE_CANCEL_VERIFY);
             result.setErrorString(EUExUtil
                     .getString("plugin_uexGestureUnlock_errorCodeCancelVerify"));
-            callBackVerify(result);
+            if (isCreate){
+                callBackCreate(result,mGestureCreateListener.callbackId);
+            }else{
+             callBackVerify(result,callbackId);
 
-            callBackEvent(JsConst.EVENT_CANCEL_VERIFY);
-            this.closeLayout();
+                callBackEvent(JsConst.EVENT_CANCEL_VERIFY);
+                this.closeLayout();
+            }
         }
 
         @Override
@@ -299,14 +296,27 @@ public class EUExGestureUnlock extends EUExBase {
         callBackPluginJs(JsConst.ON_EVENT_OCCUR, DataHelper.gson.toJson(result));
     }
 
-    private void callBackVerify(ResultVerifyVO result) {
-        callBackPluginJs(JsConst.CALLBACK_VERIFY, DataHelper.gson.toJson(result));
-    }
-    private void callBackCreate(ResultFailedVO result) {
-        callBackPluginJs(JsConst.CALLBACK_CREATE, DataHelper.gson.toJson(result));
+    private void callBackVerify(ResultVerifyVO result,int callbackId) {
+        if(callbackId!=-1){
+            callbackToJs(callbackId,false,DataHelper.gson.toJsonTree(result));
+        }else{
+            callBackPluginJs(JsConst.CALLBACK_VERIFY, DataHelper.gson.toJson(result));
+        }
+     }
+    private void callBackCreate(ResultFailedVO result, int callbackId) {
+        if(callbackId!=-1){
+            callbackToJs(callbackId,false,DataHelper.gson.toJsonTree(result));
+        }else{
+            callBackPluginJs(JsConst.CALLBACK_CREATE, DataHelper.gson.toJson(result));
+        }
     }
 
-    private GestureCreateListener mGestureCreateListener = new GestureCreateListener() {
+    MyGestureCreateListener mGestureCreateListener=new MyGestureCreateListener();
+
+    public class MyGestureCreateListener implements GestureCreateListener{
+
+        private int callbackId=-1;
+
         @Override
         public void onCreateFinished(String gestureCode) {
             ResultVerifyVO result;
@@ -318,7 +328,11 @@ public class EUExGestureUnlock extends EUExBase {
                 result = new ResultFailedVO();
                 result.setIsFinished(false);
             }
-            callBackPluginJs(JsConst.CALLBACK_CREATE, DataHelper.gson.toJson(result));
+            if(callbackId!=-1){
+                callbackToJs(callbackId,false,DataHelper.gson.toJsonTree(result));
+            }else {
+                callBackPluginJs(JsConst.CALLBACK_CREATE, DataHelper.gson.toJson(result));
+            }
             closeCreateFragment();
         }
 
@@ -339,7 +353,7 @@ public class EUExGestureUnlock extends EUExBase {
             result.setErrorCode(JsConst.ERROR_CODE_CANCEL_CREATE);
             result.setErrorString(EUExUtil
                     .getString("plugin_uexGestureUnlock_errorCodeCancelCreate"));
-            callBackCreate(result);
+            callBackCreate(result, mGestureCreateListener.callbackId);
             callBackEvent(JsConst.EVENT_CANCEL_CREATE);
             this.closeLayout();
         }

@@ -5,7 +5,7 @@
 <meta name="viewport"
     content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/index.css">
-    
+
     <script type="text/javascript">
         function openWin(name){
             uexWindow.open(name, '0', name+".html", '2', '', '', 1024);
@@ -14,15 +14,6 @@
             uexGestureUnlock.onEventOccur=function(info){
                 //alert(info);
                 console.log(info);
-            }
-            uexGestureUnlock.cbIsGestureCodeSet=function(info){
-                alert(info);
-            }
-            uexGestureUnlock.cbVerify=function(info){
-                alert(info);
-            }
-            uexGestureUnlock.cbCreate=function(info){
-                alert(info);
             }
         }
     function config(){
@@ -45,7 +36,17 @@
         var data={
             isNeedVerifyBeforeCreate:true
         }
-        uexGestureUnlock.create(JSON.stringify(data));
+        uexGestureUnlock.create(JSON.stringify(data),function(info){
+            alert("create result: "+JSON.stringify(info));
+        });
+    }
+    function isGestureCodeSet(){
+        alert("result: "+uexGestureUnlock.isGestureCodeSet());
+    }
+    function verify(){
+      uexGestureUnlock.verify(function(info){
+            alert("verify result: "+JSON.stringify(info));
+      });
     }
     </script>
 </head>
@@ -54,16 +55,16 @@
     <div class="tit">uexGestureUnlock</div>
     <div class="conbor">
         <div class="consj">
-            <input class="btn" type="button" value="isGestureCodeSet" onclick="uexGestureUnlock.isGestureCodeSet();"/>
+            <input class="btn" type="button" value="isGestureCodeSet" onclick="isGestureCodeSet();"/>
             <input class="btn" type="button" value="resetGestureCode" onclick="uexGestureUnlock.resetGestureCode();"/>
             <input class="btn" type="button" value="config" onclick="config();"/>
-            
+
             <br>
-            <input class="btn" type="button" value="verify" onclick="uexGestureUnlock.verify();"/>
+            <input class="btn" type="button" value="verify" onclick="verify();"/>
             <input class="btn" type="button" value="create" onclick="createGesture()">
             <br>
             <input class="btn" type="button" value="点击此按钮后5s,执行cancel" onclick="cancel()">
-            
+
         </div>
     </div>
 </body>
