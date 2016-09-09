@@ -13,6 +13,7 @@ import org.zywx.wbpalmstar.base.BUtility;
 import org.zywx.wbpalmstar.engine.DataHelper;
 import org.zywx.wbpalmstar.engine.EBrowserView;
 import org.zywx.wbpalmstar.engine.universalex.EUExBase;
+import org.zywx.wbpalmstar.engine.universalex.EUExCallback;
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.fragment.GestureCreateFragment;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.fragment.GestureVerifyFragment;
@@ -24,14 +25,6 @@ import org.zywx.wbpalmstar.plugin.uexgestureunlock.vo.ResultIsGestureSetVO;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.vo.ResultVerifyVO;
 
 public class EUExGestureUnlock extends EUExBase {
-
-    private static final String BUNDLE_DATA = "data";
-    private static final int MSG_IS_GESTURE_CODE_SET = 1;
-    private static final int MSG_RESET_GESTURE_CODE = 2;
-    private static final int MSG_CONFIG = 3;
-    private static final int MSG_VERIFY = 4;
-    private static final int MSG_CREATE = 5;
-    private static final int MSG_CANCEL = 6;
     private static final String PRES_KEY = "uexGestureUnlock_data_code";
     private static final String PRES_DATA_GESTURE = "uexGestureUnlock_data_code";
     private static final String TAG_GESTURE_VERIFY = "uexGestureUnlock_verify";
@@ -61,34 +54,10 @@ public class EUExGestureUnlock extends EUExBase {
     }
 
     public void resetGestureCode(String[] params) {
-        Message msg = new Message();
-        msg.obj = this;
-        msg.what = MSG_RESET_GESTURE_CODE;
-        Bundle bd = new Bundle();
-        bd.putStringArray(BUNDLE_DATA, params);
-        msg.setData(bd);
-        mHandler.sendMessage(msg);
-    }
-
-    private void resetGestureCodeMsg() {
-        mPres.edit().remove(PRES_DATA_GESTURE).commit();
+        mPres.edit().remove(PRES_DATA_GESTURE).apply();
     }
 
     public void config(String[] params) {
-        if (params == null || params.length < 1) {
-            errorCallback(0, 0, "error params!");
-            return;
-        }
-        Message msg = new Message();
-        msg.obj = this;
-        msg.what = MSG_CONFIG;
-        Bundle bd = new Bundle();
-        bd.putStringArray(BUNDLE_DATA, params);
-        msg.setData(bd);
-        mHandler.sendMessage(msg);
-    }
-
-    private void configMsg(String[] params) {
         String json = params[0];
         if (TextUtils.isEmpty(json)) return;
         mData = DataHelper.gson.fromJson(json, ConfigGestureVO.class);
@@ -119,24 +88,13 @@ public class EUExGestureUnlock extends EUExBase {
             result.setErrorCode(JsConst.ERROR_CODE_NONE_GESTURE);
             result.setErrorString(EUExUtil
                     .getString("plugin_uexGestureUnlock_errorCodeNoneGesture"));
-            callBackVerify(result,callbackId);
+            callBackVerify(result, callbackId);
             return;
         }
         openVerifyGestureLayout(false, gestureCode,callbackId);
     }
 
     public void create(String[] params) {
-        Message msg = new Message();
-        msg.obj = this;
-        msg.what = MSG_CREATE;
-        Bundle bd = new Bundle();
-        bd.putStringArray(BUNDLE_DATA, params);
-        msg.setData(bd);
-        mHandler.sendMessage(msg);
-    }
-
-    private void createMsg(String[] params) {
-
         boolean isNeedVerifyBeforeCreate = true;
         if (params != null && params.length > 0) {
             CreateGestureVO dataVO = DataHelper.gson.fromJson(params[0], CreateGestureVO.class);
@@ -183,16 +141,6 @@ public class EUExGestureUnlock extends EUExBase {
     }
 
     public void cancel(String[] params) {
-        Message msg = new Message();
-        msg.obj = this;
-        msg.what = MSG_CANCEL;
-        Bundle bd = new Bundle();
-        bd.putStringArray(BUNDLE_DATA, params);
-        msg.setData(bd);
-        mHandler.sendMessage(msg);
-    }
-
-    private void cancelMsg() {
         if (mGestureVerifyFragment != null){
             closeVerifyFragment();
             ResultFailedVO result =new ResultFailedVO();
@@ -210,31 +158,6 @@ public class EUExGestureUnlock extends EUExBase {
             result.setErrorString(EUExUtil
                     .getString("plugin_uexGestureUnlock_errorCodeCancelOutside"));
             callBackCreate(result, mGestureCreateListener.callbackId);
-        }
-    }
-
-    @Override
-    public void onHandleMessage(Message message) {
-        if(message == null){
-            return;
-        }
-        Bundle bundle=message.getData();
-        switch (message.what) {
-
-            case MSG_RESET_GESTURE_CODE:
-                resetGestureCodeMsg();
-                break;
-            case MSG_CONFIG:
-                configMsg(bundle.getStringArray(BUNDLE_DATA));
-                break;
-            case MSG_CREATE:
-                createMsg(bundle.getStringArray(BUNDLE_DATA));
-                break;
-            case MSG_CANCEL:
-                cancelMsg();
-                break;
-            default:
-                super.onHandleMessage(message);
         }
     }
 
@@ -298,14 +221,23 @@ public class EUExGestureUnlock extends EUExBase {
 
     private void callBackVerify(ResultVerifyVO result,int callbackId) {
         if(callbackId!=-1){
-            callbackToJs(callbackId,false,DataHelper.gson.toJsonTree(result));
+            if (result.isFinished()){
+                callbackToJs(callbackId,false, EUExCallback.F_C_SUCCESS);
+            }else {
+                ResultFailedVO failedVO = (ResultFailedVO) result;
+                callbackToJs(callbackId,false, failedVO.getErrorCode(), failedVO.getErrorString());
+            }
         }else{
             callBackPluginJs(JsConst.CALLBACK_VERIFY, DataHelper.gson.toJson(result));
         }
      }
     private void callBackCreate(ResultFailedVO result, int callbackId) {
         if(callbackId!=-1){
-            callbackToJs(callbackId,false,DataHelper.gson.toJsonTree(result));
+            if (result.isFinished()){
+                callbackToJs(callbackId,false, EUExCallback.F_C_SUCCESS);
+            }else {
+                callbackToJs(callbackId,false, result.getErrorCode(), result.getErrorString());
+            }
         }else{
             callBackPluginJs(JsConst.CALLBACK_CREATE, DataHelper.gson.toJson(result));
         }
@@ -329,7 +261,12 @@ public class EUExGestureUnlock extends EUExBase {
                 result.setIsFinished(false);
             }
             if(callbackId!=-1){
-                callbackToJs(callbackId,false,DataHelper.gson.toJsonTree(result));
+                if (result.isFinished()){
+                    callbackToJs(callbackId,false, EUExCallback.F_C_SUCCESS);
+                }else {
+                    ResultFailedVO failedVO = (ResultFailedVO) result;
+                    callbackToJs(callbackId,false, failedVO.getErrorCode(), failedVO.getErrorString());
+                }
             }else {
                 callBackPluginJs(JsConst.CALLBACK_CREATE, DataHelper.gson.toJson(result));
             }
