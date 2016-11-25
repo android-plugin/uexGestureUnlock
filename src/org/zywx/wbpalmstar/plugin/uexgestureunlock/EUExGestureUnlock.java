@@ -98,7 +98,9 @@ public class EUExGestureUnlock extends EUExBase {
         boolean isNeedVerifyBeforeCreate = true;
         if (params != null && params.length > 0) {
             CreateGestureVO dataVO = DataHelper.gson.fromJson(params[0], CreateGestureVO.class);
-            isNeedVerifyBeforeCreate = dataVO.isNeedVerifyBeforeCreate();
+            if(dataVO != null){
+                isNeedVerifyBeforeCreate = dataVO.isNeedVerifyBeforeCreate();
+            }
         }
         int callbackId=-1;
         if (params!=null&&params.length>1){
