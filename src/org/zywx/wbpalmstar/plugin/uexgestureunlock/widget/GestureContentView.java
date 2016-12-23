@@ -45,7 +45,7 @@ public class GestureContentView extends FrameLayout {
                               ConfigGestureVO data) {
         super(context);
         screenDisplay = GestureUtil.getScreenDisplay(context);
-        blockWidth = screenDisplay[0]/3;
+        blockWidth = screenDisplay[0]/4;
         this.list = new ArrayList<GesturePoint>();
         this.context = context;
         circleWidth = blockWidth - 2 * blockWidth/baseNum;
@@ -80,7 +80,7 @@ public class GestureContentView extends FrameLayout {
 
     public void setParentView(ViewGroup parent){
         // 得到屏幕的宽度
-        int width = screenDisplay[0];
+        int width = screenDisplay[0] * 3/ 4;
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(width, width);
         this.setLayoutParams(layoutParams);
         gestureDrawline.setLayoutParams(layoutParams);

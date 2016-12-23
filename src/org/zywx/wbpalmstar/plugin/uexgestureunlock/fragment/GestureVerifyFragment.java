@@ -19,6 +19,7 @@ import org.zywx.wbpalmstar.base.BUtility;
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.EUExGestureUnlock.GestureVerifyListener;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.JsConst;
+import org.zywx.wbpalmstar.plugin.uexgestureunlock.util.GestureUtil;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.vo.ConfigGestureVO;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.vo.ResultFailedVO;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.vo.ResultVerifyVO;
@@ -58,6 +59,12 @@ public class GestureVerifyFragment extends GestureBaseFragment implements OnClic
             if (mData != null){
                 setUpData();
             }
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.topMargin = GestureUtil.getScreenDisplay(this.getActivity())[0] / 8;
+            layoutParams.leftMargin = GestureUtil.getScreenDisplay(this.getActivity())[0] / 8;
+            layoutParams.addRule(RelativeLayout.BELOW, EUExUtil.getResIdID("plugin_uexGestureUnlock_gesture_tip_layout"));
+            mGestureContainer.setLayoutParams(layoutParams);
             setParentViewFrameLayout(mGestureContainer);
             // 初始化一个显示各个点的viewGroup
             mGestureContentView = new GestureContentView(this.getActivity(), true, mGestureCode,

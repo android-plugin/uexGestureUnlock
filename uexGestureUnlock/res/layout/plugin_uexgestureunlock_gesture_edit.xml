@@ -8,7 +8,7 @@
     <LinearLayout
         android:id="@+id/plugin_uexGestureUnlock_gesture_tip_layout"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="120dp"
         android:layout_alignParentTop="true"
         android:gravity="center"
         android:orientation="vertical"
@@ -20,9 +20,7 @@
         android:id="@+id/plugin_uexGestureUnlock_gesture_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/plugin_uexGestureUnlock_gesture_tip_layout"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dip" >
+        android:layout_below="@id/plugin_uexGestureUnlock_gesture_tip_layout">
     </FrameLayout>
 
     <RelativeLayout

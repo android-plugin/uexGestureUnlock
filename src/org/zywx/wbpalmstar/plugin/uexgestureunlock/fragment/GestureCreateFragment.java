@@ -20,6 +20,7 @@ import org.zywx.wbpalmstar.base.BUtility;
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.EUExGestureUnlock.GestureCreateListener;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.JsConst;
+import org.zywx.wbpalmstar.plugin.uexgestureunlock.util.GestureUtil;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.vo.ConfigGestureVO;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.vo.ResultEventVO;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.vo.ResultFailedVO;
@@ -59,6 +60,12 @@ public class GestureCreateFragment extends GestureBaseFragment implements OnClic
             mTextReset.setClickable(false);
             mGestureContainer = (FrameLayout) view.findViewById(EUExUtil
                     .getResIdID("plugin_uexGestureUnlock_gesture_container"));
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.topMargin = GestureUtil.getScreenDisplay(this.getActivity())[0] / 8;
+            layoutParams.leftMargin = GestureUtil.getScreenDisplay(this.getActivity())[0] / 8;
+            layoutParams.addRule(RelativeLayout.BELOW, EUExUtil.getResIdID("plugin_uexGestureUnlock_gesture_tip_layout"));
+            mGestureContainer.setLayoutParams(layoutParams);
             setParentViewFrameLayout(mGestureContainer);
             setTipLayout();
             setUpData();

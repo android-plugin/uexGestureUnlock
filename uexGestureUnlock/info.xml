@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexGestureUnlock" version="4.0.1" build="2">
-        <info>2:修复create接口第一个参数传空时崩溃的问题</info>
-        <info>1:4.0</info>
+        uexName="uexGestureUnlock" version="4.0.2" build="2">
+        <info>2:手势密码界面调整</info>
+        <build>1:修复create接口第一个参数传空时崩溃的问题</build>
         <build>0:uexGestureUnlock手势密码插件</build>
     </plugin>
 </uexplugins>
