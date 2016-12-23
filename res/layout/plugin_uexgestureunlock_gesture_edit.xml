@@ -2,13 +2,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#48423D"
+    android:paddingTop = "40dp"
     android:id="@+id/plugin_uexGestureUnlock_bg"
     >
 
     <LinearLayout
         android:id="@+id/plugin_uexGestureUnlock_gesture_tip_layout"
         android:layout_width="fill_parent"
-        android:layout_height="120dp"
+        android:layout_height="130dp"
         android:layout_alignParentTop="true"
         android:gravity="center"
         android:orientation="vertical"

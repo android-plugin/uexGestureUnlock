@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#48443c"
+    android:paddingTop = "40dp"
     android:id="@+id/plugin_uexGestureUnlock_bg"
     >
     <LinearLayout
@@ -10,8 +11,8 @@
         android:layout_width="fill_parent"
         android:layout_height="130dp"
         android:layout_alignParentTop="true"
-        android:orientation="vertical"
-        android:paddingTop="20dip" >
+        android:gravity="bottom"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/plugin_uexGestureUnlock_user_logo"
