@@ -205,7 +205,7 @@ public class GestureCreateFragment extends GestureBaseFragment implements OnClic
     }
 
     private boolean isInputPassValidate(String inputPassword) {
-        return (!TextUtils.isEmpty(inputPassword) && inputPassword.length() > 3);
+        return (!TextUtils.isEmpty(inputPassword) && inputPassword.length() >= mData.getMinimumCodeLength());
     }
 
     @Override

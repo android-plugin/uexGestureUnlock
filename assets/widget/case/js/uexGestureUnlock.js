@@ -4,7 +4,8 @@ if (UNIT_TEST) {
         "resetGestureCode":function(){
             uexGestureUnlock.resetGestureCode();
             UNIT_TEST.assert(true);
-        },
+        }
+        ,
         "create":function(){
             var params = {
                 isNeedVerifyBeforeCreate:false
@@ -29,8 +30,8 @@ if (UNIT_TEST) {
         },
         "config":function(){
             var params = {
-                backgroundImage:"res://gestureunlock_bgImage.jpg",
-                iconImage:"res://gestureunlock_icon.png",
+                backgroundImage:"res://bgImage_1.png",
+                iconImage:"res://icon2.png",
                 normalThemeColor:"#F1F1F1",
                 selectedThemeColor:"#00ff00",
                 errorThemeColor:"#ff0000",
