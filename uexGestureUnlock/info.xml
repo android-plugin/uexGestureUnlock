@@ -2,7 +2,7 @@
 <uexplugins>
     <plugin
         uexName="uexGestureUnlock" version="4.0.3" build="3">
-        <info>3:修复config接口最短密码长度配置不生效的问题</info>
+        <info>3:(依赖4.1.6引擎)修复程序启动时调用verify接口无效的问题，修复config接口最短密码长度配置不生效的问题</info>
         <build>2:手势密码界面调整</build>
         <build>1:修复create接口第一个参数传空时崩溃的问题</build>
         <build>0:uexGestureUnlock手势密码插件</build>

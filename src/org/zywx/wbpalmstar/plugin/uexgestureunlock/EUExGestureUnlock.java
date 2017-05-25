@@ -83,7 +83,6 @@ public class EUExGestureUnlock extends EUExBase {
         if (params!=null&&params.length>0){
             callbackId= Integer.parseInt(params[0]);
         }
-        final int callbackId1 = callbackId;
         final String gestureCode = getGestureData();
         if (TextUtils.isEmpty(gestureCode)){
             ResultFailedVO result = new ResultFailedVO();
@@ -93,12 +92,7 @@ public class EUExGestureUnlock extends EUExBase {
             callBackVerify(result, callbackId);
             return;
         }
-        new Handler().postDelayed(new Runnable(){
-            public void run() {
-                //execute the task
-                openVerifyGestureLayout(false, gestureCode, callbackId1);
-            }
-        }, 200);
+        openVerifyGestureLayout(false, gestureCode, callbackId);
     }
 
     public void create(String[] params) {
