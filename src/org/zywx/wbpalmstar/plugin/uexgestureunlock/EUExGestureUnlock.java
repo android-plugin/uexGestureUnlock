@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.ViewGroup;
@@ -82,7 +83,8 @@ public class EUExGestureUnlock extends EUExBase {
         if (params!=null&&params.length>0){
             callbackId= Integer.parseInt(params[0]);
         }
-        String gestureCode = getGestureData();
+        final int callbackId1 = callbackId;
+        final String gestureCode = getGestureData();
         if (TextUtils.isEmpty(gestureCode)){
             ResultFailedVO result = new ResultFailedVO();
             result.setErrorCode(JsConst.ERROR_CODE_NONE_GESTURE);
@@ -91,7 +93,12 @@ public class EUExGestureUnlock extends EUExBase {
             callBackVerify(result, callbackId);
             return;
         }
-        openVerifyGestureLayout(false, gestureCode,callbackId);
+        new Handler().postDelayed(new Runnable(){
+            public void run() {
+                //execute the task
+                openVerifyGestureLayout(false, gestureCode, callbackId1);
+            }
+        }, 200);
     }
 
     public void create(String[] params) {
