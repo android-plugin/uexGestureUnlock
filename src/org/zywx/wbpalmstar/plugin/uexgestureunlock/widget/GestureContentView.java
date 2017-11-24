@@ -3,7 +3,6 @@ package org.zywx.wbpalmstar.plugin.uexgestureunlock.widget;
 import java.util.ArrayList;
 import java.util.List;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -144,12 +143,7 @@ public class GestureContentView extends FrameLayout {
         screenDisplay = GestureUtil.getScreenDisplay(getContext());
         int width = this.getLayoutParams().width;
         int screenWidth = screenDisplay[0];
-        Log.i("test","onMeasure "  + width + "  " + screenWidth);
         if(width != screenDisplay[0]){
-            /*LayoutParams layoutParams = (LayoutParams) (gestureDrawline.getLayoutParams());
-            layoutParams.width = screenWidth;
-            layoutParams.height = screenWidth;
-            gestureDrawline.setLayoutParams(layoutParams);*/
             setMeasuredDimension(screenWidth, screenWidth);
             return;
         }
