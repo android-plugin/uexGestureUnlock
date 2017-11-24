@@ -44,6 +44,9 @@ public class GesturePoint {
      */
     private int num;
 
+    public GesturePoint(){
+    }
+
     public GesturePoint(int leftX, int rightX, int topY, int bottomY,
                         CircleImageView image, int num) {
         super();
@@ -65,6 +68,7 @@ public class GesturePoint {
 
     public void setLeftX(int leftX) {
         this.leftX = leftX;
+        this.centerX = (leftX + rightX) / 2;
     }
 
     public int getRightX() {
@@ -73,6 +77,7 @@ public class GesturePoint {
 
     public void setRightX(int rightX) {
         this.rightX = rightX;
+        this.centerX = (leftX + rightX) / 2;
     }
 
     public int getTopY() {
@@ -81,6 +86,7 @@ public class GesturePoint {
 
     public void setTopY(int topY) {
         this.topY = topY;
+        this.centerY = (topY + bottomY) / 2;
     }
 
     public int getBottomY() {
@@ -89,6 +95,7 @@ public class GesturePoint {
 
     public void setBottomY(int bottomY) {
         this.bottomY = bottomY;
+        this.centerY = (topY + bottomY) / 2;
     }
 
     public CircleImageView getImage() {

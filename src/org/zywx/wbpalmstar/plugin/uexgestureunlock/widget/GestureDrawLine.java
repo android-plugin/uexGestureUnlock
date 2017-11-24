@@ -85,7 +85,7 @@ public class GestureDrawLine extends View {
         this.blockWidth = blockWidth;
         screenDisplay = GestureUtil.getScreenDisplay(context);
         paint = new Paint(Paint.DITHER_FLAG);// 创建一个画笔
-        bitmap = Bitmap.createBitmap(screenDisplay[0], screenDisplay[0], Bitmap.Config.ARGB_8888); // 设置位图的宽高
+        bitmap = Bitmap.createBitmap(screenDisplay[0], screenDisplay[0], Bitmap.Config.ARGB_4444); // 设置位图的宽高
         canvas = new Canvas();
         canvas.setBitmap(bitmap);
         paint.setStyle(Style.STROKE);// 设置非填充
@@ -109,6 +109,10 @@ public class GestureDrawLine extends View {
         this.errorColor = data.getErrorThemeColor();
     }
 
+    public void setBlockWidth(int blockWidth){
+        this.blockWidth = blockWidth;
+    }
+
     private void initAutoCheckPointMap() {
         autoCheckPointMap = new HashMap<String,GesturePoint>();
         autoCheckPointMap.put("1,3", getGesturePointByNum(2));
@@ -128,6 +132,22 @@ public class GestureDrawLine extends View {
             }
         }
         return null;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        screenDisplay = GestureUtil.getScreenDisplay(getContext());
+        int width = this.getLayoutParams().width;
+        int screenWidth = screenDisplay[0];
+        if (width != screenDisplay[0]) {
+            if (bitmap != null) {
+                bitmap.recycle();
+                bitmap = Bitmap.createBitmap(screenDisplay[0], screenDisplay[0], Bitmap.Config.ARGB_4444); // 设置位图的宽高
+                canvas.setBitmap(bitmap);
+            }
+            setMeasuredDimension(screenWidth, screenWidth);
+        }
     }
 
     // 画位图
