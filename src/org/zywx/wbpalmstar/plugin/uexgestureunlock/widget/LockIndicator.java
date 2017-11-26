@@ -31,6 +31,7 @@ public class LockIndicator extends View {
     private int width;
     private int height;
     private int currentPressedColor;
+    private boolean isShowTrack;
 
     public LockIndicator(Context paramContext) {
         super(paramContext);
@@ -54,6 +55,7 @@ public class LockIndicator extends View {
         this.normalColor = data.getNormalThemeColor();
         this.pressedColor = data.getSelectedThemeColor();
         this.errorColor = data.getErrorThemeColor();
+        this.isShowTrack = data.isShowTrack();
         this.currentPressedColor = pressedColor;
     }
 

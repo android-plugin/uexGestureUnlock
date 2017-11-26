@@ -18,6 +18,7 @@ public class CircleImageView extends ImageView{
     private int state;
     private int blockWidth;
     private int radius;
+    private boolean isShowTrack = true;
 
     public int getRadius() {
         return radius;
@@ -27,7 +28,7 @@ public class CircleImageView extends ImageView{
         super(context);
     }
 
-    public CircleImageView(Context context, int width, int normalColor, int selectedColor, int errorColor) {
+    public CircleImageView(Context context, int width, int normalColor, int selectedColor, int errorColor, boolean isShowTrack) {
         super(context);
         paint = new Paint();
         paint.setAntiAlias(true);
@@ -38,6 +39,7 @@ public class CircleImageView extends ImageView{
         this.currentColor = normalColor;
         this.blockWidth = width;
         this.radius = blockWidth / 3;
+        this.isShowTrack = isShowTrack;
     }
 
     @Override
@@ -48,7 +50,10 @@ public class CircleImageView extends ImageView{
         paint.setColor(currentColor);
         canvas.drawCircle(blockWidth / 2, blockWidth / 2, radius, paint);
 
-        if (state != JsConst.POINT_STATE_NORMAL){
+        if (state != JsConst.POINT_STATE_NORMAL) {
+            if (state == JsConst.POINT_STATE_SELECTED && !isShowTrack) {
+                return;
+            }
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(currentColor);
             canvas.drawCircle(blockWidth / 2, blockWidth / 2, radius / 2, paint);
@@ -56,14 +61,18 @@ public class CircleImageView extends ImageView{
 
     }
 
-    public void setCurrentState(int state){
+    public void setCurrentState(int state) {
         this.state = state;
-        switch (state){
+        switch (state) {
             case JsConst.POINT_STATE_NORMAL:
                 this.currentColor = normalColor;
                 break;
             case JsConst.POINT_STATE_SELECTED:
-                this.currentColor = selectedColor;
+                if (isShowTrack) {
+                    this.currentColor = selectedColor;
+                } else {
+                    this.currentColor = normalColor;
+                }
                 break;
             case JsConst.POINT_STATE_WRONG:
                 this.currentColor = errorColor;

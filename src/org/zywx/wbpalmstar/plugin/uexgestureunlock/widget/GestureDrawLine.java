@@ -76,6 +76,9 @@ public class GestureDrawLine extends View {
 
     private int errorColor;
 
+    //是否显示轨迹
+    private boolean isShowTrack = true;
+
     public GestureDrawLine(Context context, List<GesturePoint> list, boolean isVerify,
                            String passWord, GestureCallBack callBack,
                            OnDrawArrowListener listener,
@@ -107,6 +110,7 @@ public class GestureDrawLine extends View {
 
         this.selectedColor = data.getSelectedThemeColor();
         this.errorColor = data.getErrorThemeColor();
+        this.isShowTrack = data.isShowTrack();
     }
 
     private void initAutoCheckPointMap() {
@@ -180,13 +184,19 @@ public class GestureDrawLine extends View {
                         JsConst.POINT_STATE_SELECTED == pointAt.getPointState()) {
                     // 点击移动区域不在圆的区域，或者当前点击的点与当前移动到的点的位置相同，或者当前点击的点处于选中状态
                     // 那么以当前的点中心为起点，以手指移动位置为终点画线
-                    canvas.drawLine(currentPoint.getCenterX(), currentPoint.getCenterY(),
-                            event.getX(), event.getY(), paint);// 画线
+                    //是否显示痕迹
+                    if (isShowTrack) {
+                        canvas.drawLine(currentPoint.getCenterX(), currentPoint.getCenterY(),
+                                event.getX(), event.getY(), paint);// 画线
+                    }
                 } else {
                     // 如果当前点击的点与当前移动到的点的位置不同
                     // 那么以前前点的中心为起点，以手移动到的点的位置画线
-                    canvas.drawLine(currentPoint.getCenterX(), currentPoint.getCenterY(),
-                            pointAt.getCenterX(), pointAt.getCenterY(), paint);// 画线
+                    //是否显示痕迹
+                    if (isShowTrack) {
+                        canvas.drawLine(currentPoint.getCenterX(), currentPoint.getCenterY(),
+                                pointAt.getCenterX(), pointAt.getCenterY(), paint);// 画线
+                    }
                     pointAt.setPointState(JsConst.POINT_STATE_SELECTED);
 
                     // 判断是否中间点需要选中
@@ -332,9 +342,11 @@ public class GestureDrawLine extends View {
      */
     private void clearScreenAndDrawList() {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        for (Pair<GesturePoint, GesturePoint> pair : lineList) {
-            canvas.drawLine(pair.first.getCenterX(), pair.first.getCenterY(),
-                    pair.second.getCenterX(), pair.second.getCenterY(), paint);// 画线
+        if (isShowTrack) {
+            for (Pair<GesturePoint, GesturePoint> pair : lineList) {
+                canvas.drawLine(pair.first.getCenterX(), pair.first.getCenterY(),
+                        pair.second.getCenterX(), pair.second.getCenterY(), paint);// 画线
+            }
         }
     }
 

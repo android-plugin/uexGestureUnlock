@@ -61,7 +61,7 @@ public class GestureContentView extends FrameLayout {
             CircleImageView image = new CircleImageView(context, circleWidth,
                     data.getNormalThemeColor(),
                     data.getSelectedThemeColor(),
-                    data.getErrorThemeColor());
+                    data.getErrorThemeColor(), data.isShowTrack());
             this.addView(image);
             invalidate();
             // 第几行

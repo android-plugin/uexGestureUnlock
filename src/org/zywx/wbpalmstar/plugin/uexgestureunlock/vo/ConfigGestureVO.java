@@ -29,6 +29,16 @@ public class ConfigGestureVO implements Serializable{
     private String restartCreationButtonTitle = EUExUtil.getString("plugin_uexGestureUnlock_restartCreationButtonTitle");
     private String backgroundImage;
     private String iconImage;
+    //是否显示轨迹
+    private boolean isShowTrack = true;
+
+    public boolean isShowTrack() {
+        return isShowTrack;
+    }
+
+    public void setShowTrack(boolean showTrack) {
+        isShowTrack = showTrack;
+    }
 
     public int getMinimumCodeLength() {
         return minimumCodeLength;

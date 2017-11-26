@@ -19,6 +19,9 @@ public class ArrowSlideLine extends View{
     private int normalColor;
     private int errorColor;
     private int currentColor;
+    //是否显示轨迹
+    private boolean isShowTrack = true;
+
 
     public ArrowSlideLine(Context context) {
         super(context);
@@ -38,21 +41,24 @@ public class ArrowSlideLine extends View{
         this.normalColor = data.getSelectedThemeColor();
         this.errorColor = data.getErrorThemeColor();
         this.currentColor = this.normalColor;
+        this.isShowTrack = data.isShowTrack();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(3);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(currentColor);
-        triangle.moveTo(startPoint.getX(), startPoint.getY());
-        triangle.lineTo(startPoint.getX() - triangleSide, startPoint.getY() + triangleSide);
-        triangle.lineTo(startPoint.getX() + triangleSide, startPoint.getY() + triangleSide);
-        triangle.close();
-        canvas.rotate(angle, centerPoint.getX(), centerPoint.getY());
-        canvas.drawPath(triangle, paint);
+        if (isShowTrack) {
+            paint.setAntiAlias(true);
+            paint.setStrokeWidth(3);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(currentColor);
+            triangle.moveTo(startPoint.getX(), startPoint.getY());
+            triangle.lineTo(startPoint.getX() - triangleSide, startPoint.getY() + triangleSide);
+            triangle.lineTo(startPoint.getX() + triangleSide, startPoint.getY() + triangleSide);
+            triangle.close();
+            canvas.rotate(angle, centerPoint.getX(), centerPoint.getY());
+            canvas.drawPath(triangle, paint);
+        }
     }
 
     public void setStateError() {
