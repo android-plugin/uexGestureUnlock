@@ -40,6 +40,12 @@ public class CircleImageView extends ImageView{
         this.radius = blockWidth / 3;
     }
 
+    public void setCircleWidth(int width){
+        this.blockWidth = width;
+        this.radius = blockWidth / 3;
+    }
+
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
