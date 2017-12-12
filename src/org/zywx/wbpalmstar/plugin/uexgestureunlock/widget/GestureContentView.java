@@ -31,10 +31,10 @@ public class GestureContentView extends FrameLayout {
      * 声明一个集合用来封装坐标集合
      */
     private List<GesturePoint> list;
-    private Context context;
     private GestureDrawLine gestureDrawline;
 
     private int circleWidth;
+    private int leftMargin;
 
     /**
      * 包含9个ImageView的容器，初始化
@@ -44,11 +44,8 @@ public class GestureContentView extends FrameLayout {
                               OnDrawArrowListener listener,
                               ConfigGestureVO data) {
         super(context);
-        screenDisplay = GestureUtil.getScreenDisplay(context);
-        blockWidth = screenDisplay[0]/3;
+        initData();
         this.list = new ArrayList<GesturePoint>();
-        this.context = context;
-        circleWidth = blockWidth - 2 * blockWidth/baseNum;
         // 添加9个图标
         addChild(data);
         // 初始化一个可以画线的view
@@ -56,25 +53,57 @@ public class GestureContentView extends FrameLayout {
                 callBack, listener, circleWidth, data);
     }
 
+    private void initData(){
+        screenDisplay = GestureUtil.getScreenDisplay(getContext());
+        if(screenDisplay[0] > screenDisplay[1]){
+            // 横屏
+            blockWidth = screenDisplay[1]/5;
+            // 横屏 计算居中偏移
+            leftMargin = screenDisplay[0]/2 - 2 * blockWidth + blockWidth / 2;
+        } else {
+            blockWidth = screenDisplay[0]/3;
+            // 竖屏 满屏居中
+            leftMargin = 0;
+        }
+        circleWidth = blockWidth - 2 * blockWidth/baseNum;
+    }
+
     private void addChild(ConfigGestureVO data){
         for (int i = 0; i < 9; i++) {
-            CircleImageView image = new CircleImageView(context, circleWidth,
+            CircleImageView image = new CircleImageView(getContext(), circleWidth,
                     data.getNormalThemeColor(),
                     data.getSelectedThemeColor(),
                     data.getErrorThemeColor());
             this.addView(image);
-            invalidate();
-            // 第几行
-            int row = i / 3;
-            // 第几列
-            int col = i % 3;
-            // 定义点的每个属性
-            int leftX = col*blockWidth+blockWidth/baseNum;
-            int topY = row*blockWidth+blockWidth/baseNum;
-            int rightX = col*blockWidth+blockWidth-blockWidth/baseNum;
-            int bottomY = row*blockWidth+blockWidth-blockWidth/baseNum;
-            GesturePoint p = new GesturePoint(leftX, rightX, topY, bottomY, image, i+1);
+            //invalidate();
+            GesturePoint p = new GesturePoint();
+            p.setImage(image);
+            p.setNum(i+1);
+            resetPoint(p,i);
             this.list.add(p);
+        }
+    }
+
+    private void resetPoint(GesturePoint p, int index) {
+        // 第几行
+        int row = index / 3;
+        // 第几列
+        int col = index % 3;
+        // 定义点的每个属性
+        int leftX = col * blockWidth + blockWidth / baseNum;
+        int topY = row * blockWidth + blockWidth / baseNum;
+        int rightX = col * blockWidth + blockWidth - blockWidth / baseNum;
+        int bottomY = row * blockWidth + blockWidth - blockWidth / baseNum;
+        p.setLeftX(leftX + leftMargin);
+        p.setRightX(rightX + leftMargin);
+        p.setTopY(topY);
+        p.setBottomY(bottomY);
+    }
+
+    private void resetAllGesturePoint(){
+        int size = this.list.size();
+        for (int i = 0; i < size; i++) {
+            resetPoint(list.get(i),i);
         }
     }
 
@@ -90,14 +119,20 @@ public class GestureContentView extends FrameLayout {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if(changed){
+            initData();
+            gestureDrawline.setBlockWidth(circleWidth);
+            resetAllGesturePoint();
+        }
         for (int i = 0; i < getChildCount(); i++) {
             //第几行
             int row = i/3;
             //第几列
             int col = i%3;
-            View v = getChildAt(i);
-            v.layout(col*blockWidth+blockWidth/baseNum, row*blockWidth+blockWidth/baseNum,
-                    col*blockWidth+blockWidth-blockWidth/baseNum,
+            CircleImageView v = (CircleImageView)getChildAt(i);
+            v.setCircleWidth(circleWidth);
+            v.layout(col*blockWidth+blockWidth/baseNum + leftMargin, row*blockWidth+blockWidth/baseNum,
+                    col*blockWidth+blockWidth-blockWidth/baseNum + leftMargin,
                     row*blockWidth+blockWidth-blockWidth/baseNum);
         }
     }
@@ -105,6 +140,13 @@ public class GestureContentView extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        screenDisplay = GestureUtil.getScreenDisplay(getContext());
+        int width = this.getLayoutParams().width;
+        int screenWidth = screenDisplay[0];
+        if(width != screenDisplay[0]){
+            setMeasuredDimension(screenWidth, screenWidth);
+            return;
+        }
         // 遍历设置每个子view的大小
         for (int i = 0; i < getChildCount(); i++) {
             View v = getChildAt(i);

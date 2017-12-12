@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.os.Handler;
 import android.util.Log;
@@ -32,8 +33,7 @@ public class GestureDrawLine extends View {
     private int mov_x;// 声明起点坐标
     private int mov_y;
     private Paint paint;// 声明画笔
-    private Canvas canvas;// 画布
-    private Bitmap bitmap;// 位图
+    private Path linePath;
     private List<GesturePoint> list;// 装有各个view坐标的集合
     private List<Pair<GesturePoint, GesturePoint>> lineList;// 记录画过的线
     private Map<String, GesturePoint> autoCheckPointMap;// 自动选中的情况点
@@ -85,9 +85,7 @@ public class GestureDrawLine extends View {
         this.blockWidth = blockWidth;
         screenDisplay = GestureUtil.getScreenDisplay(context);
         paint = new Paint(Paint.DITHER_FLAG);// 创建一个画笔
-        bitmap = Bitmap.createBitmap(screenDisplay[0], screenDisplay[0], Bitmap.Config.ARGB_8888); // 设置位图的宽高
-        canvas = new Canvas();
-        canvas.setBitmap(bitmap);
+        linePath = new Path();// 使用Path代替之前的canvas记录连线
         paint.setStyle(Style.STROKE);// 设置非填充
         paint.setStrokeWidth(5);// 笔宽5像素
         paint.setColor(selectedColor);// 设置默认连线颜色
@@ -107,6 +105,10 @@ public class GestureDrawLine extends View {
 
         this.selectedColor = data.getSelectedThemeColor();
         this.errorColor = data.getErrorThemeColor();
+    }
+
+    public void setBlockWidth(int blockWidth){
+        this.blockWidth = blockWidth;
     }
 
     private void initAutoCheckPointMap() {
@@ -130,12 +132,22 @@ public class GestureDrawLine extends View {
         return null;
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        screenDisplay = GestureUtil.getScreenDisplay(getContext());
+        int width = this.getLayoutParams().width;
+        int screenWidth = screenDisplay[0];
+        if (width != screenDisplay[0]) {
+            setMeasuredDimension(screenWidth, screenWidth);
+        }
+    }
+
     // 画位图
     @Override
     protected void onDraw(Canvas canvas) {
         // super.onDraw(canvas);
-        canvas.drawBitmap(bitmap, 0, 0, null);
-
+        canvas.drawPath(linePath, paint);
     }
 
     // 触摸事件
@@ -156,7 +168,6 @@ public class GestureDrawLine extends View {
                     currentPoint.setPointState(JsConst.POINT_STATE_SELECTED);
                     passWordSb.append(currentPoint.getNum());
                 }
-                // canvas.drawPoint(mov_x, mov_y, paint);// 画点
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -180,13 +191,13 @@ public class GestureDrawLine extends View {
                         JsConst.POINT_STATE_SELECTED == pointAt.getPointState()) {
                     // 点击移动区域不在圆的区域，或者当前点击的点与当前移动到的点的位置相同，或者当前点击的点处于选中状态
                     // 那么以当前的点中心为起点，以手指移动位置为终点画线
-                    canvas.drawLine(currentPoint.getCenterX(), currentPoint.getCenterY(),
-                            event.getX(), event.getY(), paint);// 画线
+                    linePath.moveTo(currentPoint.getCenterX(), currentPoint.getCenterY());
+                    linePath.lineTo(event.getX(), event.getY());// 画线
                 } else {
                     // 如果当前点击的点与当前移动到的点的位置不同
                     // 那么以前前点的中心为起点，以手移动到的点的位置画线
-                    canvas.drawLine(currentPoint.getCenterX(), currentPoint.getCenterY(),
-                            pointAt.getCenterX(), pointAt.getCenterY(), paint);// 画线
+                    linePath.moveTo(currentPoint.getCenterX(), currentPoint.getCenterY());
+                    linePath.lineTo(pointAt.getCenterX(), pointAt.getCenterY());
                     pointAt.setPointState(JsConst.POINT_STATE_SELECTED);
 
                     // 判断是否中间点需要选中
@@ -331,10 +342,13 @@ public class GestureDrawLine extends View {
      * 清掉屏幕上所有的线，然后画出集合里面的线
      */
     private void clearScreenAndDrawList() {
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        linePath.reset();
+        if (lineList.size() > 0) {
+            Pair<GesturePoint, GesturePoint> pair = lineList.get(0);
+            linePath.moveTo(pair.first.getCenterX(), pair.first.getCenterY());
+        }
         for (Pair<GesturePoint, GesturePoint> pair : lineList) {
-            canvas.drawLine(pair.first.getCenterX(), pair.first.getCenterY(),
-                    pair.second.getCenterX(), pair.second.getCenterY(), paint);// 画线
+            linePath.lineTo(pair.second.getCenterX(), pair.second.getCenterY());
         }
     }
 
@@ -342,16 +356,19 @@ public class GestureDrawLine extends View {
      * 校验错误/两次绘制不一致提示
      */
     private void drawErrorPathTip() {
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        linePath.reset();
         if (mOnDrawArrowListener != null){
             mOnDrawArrowListener.onErrorState();
         }
         paint.setColor(errorColor);// 设置错误线路颜色
+        if (lineList.size() > 0) {
+            Pair<GesturePoint, GesturePoint> pair = lineList.get(0);
+            linePath.moveTo(pair.first.getCenterX(), pair.first.getCenterY());
+        }
         for (Pair<GesturePoint, GesturePoint> pair : lineList) {
             pair.first.setPointState(JsConst.POINT_STATE_WRONG);
             pair.second.setPointState(JsConst.POINT_STATE_WRONG);
-            canvas.drawLine(pair.first.getCenterX(), pair.first.getCenterY(),
-                    pair.second.getCenterX(), pair.second.getCenterY(), paint);// 画线
+            linePath.lineTo(pair.second.getCenterX(), pair.second.getCenterY());
         }
         invalidate();
     }
