@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexGestureUnlock" version="4.0.3" build="3">
-        <info>3:(依赖4.1.6引擎)修复程序启动时调用verify接口无效的问题，修复config接口最短密码长度配置不生效的问题</info>
+        uexName="uexGestureUnlock" version="4.0.6" build="2019031301">
+        <info>6:修复手势密码界面的手势事件会穿透到下层View的问题</info>
+        <build>4:增加隐藏手势功能</build>
+        <build>3:(依赖4.1.6引擎)修复程序启动时调用verify接口无效的问题，修复config接口最短密码长度配置不生效的问题</build>
         <build>2:手势密码界面调整</build>
         <build>1:修复create接口第一个参数传空时崩溃的问题</build>
         <build>0:uexGestureUnlock手势密码插件</build>
