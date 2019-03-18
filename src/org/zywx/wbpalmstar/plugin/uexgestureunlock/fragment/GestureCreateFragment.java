@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.zywx.wbpalmstar.base.BDebug;
 import org.zywx.wbpalmstar.base.BUtility;
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
 import org.zywx.wbpalmstar.plugin.uexgestureunlock.EUExGestureUnlock.GestureCreateListener;
@@ -50,6 +52,14 @@ public class GestureCreateFragment extends GestureBaseFragment implements OnClic
             view = inflater.inflate(
                     EUExUtil.getResLayoutID("plugin_uexgestureunlock_gesture_edit"),
                     container, false);
+            view.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    // 拦截所有手势事件，防止透传到手势密码界面下面。因为优先级问题，此处不会妨碍手势功能。
+                    BDebug.d("GestureCreateFragment received onTouch");
+                    return true;
+                }
+            });
             mBg = (RelativeLayout) view.findViewById(EUExUtil.getResIdID("plugin_uexGestureUnlock_bg"));
             mGestureTipLayout = (LinearLayout) view.findViewById(
                     EUExUtil.getResIdID("plugin_uexGestureUnlock_gesture_tip_layout"));
